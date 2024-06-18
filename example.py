@@ -1,7 +1,7 @@
 import canopen
 import time
 import curses
-from driver import Driver
+from driver_control_canopen import Driver
 
 
 d = Driver(127, "od.eds", "can0")
@@ -59,8 +59,7 @@ def start():
     d.switchOn()
     d.enableOperation()
     d.setMode(Driver.Mode.ProfileTorque)
-    d.setTorqueSlope(100)
-    node.sdo[0x6087].phys = 100
+    d.setTorqueSlope(1000)
     d.setTargetTorque(0)
     d.startOperation()
 
@@ -81,8 +80,8 @@ def main(screen):
             last_time = start_time
             start_time = time.time()
             node.tpdo[1].wait_for_reception(1)
-            if i == 5000:
-                node.rpdo[1][0x6071].raw = 80
+            if i == 500:
+                node.rpdo[1][0x6071].raw = 40 # ‰ du courant nominal
             values = getValue()
             screen.addstr(1, 21, f"{values[0]:10}")
             screen.addstr(2, 21, f"{values[1]:10}")
