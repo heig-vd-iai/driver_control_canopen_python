@@ -208,6 +208,12 @@ class Driver:
     def setProfileDeceleration(self, deceleration):
         self.node.sdo[0x6084].phys = deceleration
 
+    def getTorqueSlope(self):
+        return self.node.sdo[0x6087].phys
+
+    def setTorqueSlope(self, value):
+        self.node.sdo[0x6087].phys = value
+
     def saveParameters(self, parameter):
         if type(parameter) == self.SaveParameters:
             self.node.sdo[0x1010][parameter.value].phys = 0x65766173

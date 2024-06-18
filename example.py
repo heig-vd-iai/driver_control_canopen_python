@@ -2,7 +2,6 @@ import canopen
 import time
 import curses
 from driver import Driver
-import matplotlib.pyplot as plt
 
 
 d = Driver(127, "od.eds", "can0")
@@ -18,8 +17,8 @@ def initPDO():
     node.tpdo[2].clear()
     node.tpdo[1].trans_type = 0xFF
     node.tpdo[2].trans_type = 0xFF
-    node.tpdo[1].event_timer = 1
-    node.tpdo[2].event_timer = 1
+    node.tpdo[1].event_timer = 10
+    node.tpdo[2].event_timer = 10
     node.tpdo[1].enabled = True
     node.tpdo[2].enabled = True
     node.tpdo[1].add_variable(0x6064)  # Position actual value
@@ -42,7 +41,10 @@ def getValue():
         Returns:
             tuple: (position, velocity, additional position)
     '''
-    return node.pdo[0x6064].raw, node.pdo[0x606C].raw, node.pdo[0x20A0].raw
+    try:
+        return node.pdo[0x6064].raw, node.pdo[0x606C].raw, node.sdo[0x20A0].raw
+    except:
+        return 0, 0, 0
 
 
 def init():
@@ -50,10 +52,15 @@ def init():
 
 
 def start():
+    '''
+    Start Sequence for initialize drive to torque mode
+    '''
     d.shutdown()
     d.switchOn()
     d.enableOperation()
     d.setMode(Driver.Mode.ProfileTorque)
+    d.setTorqueSlope(100)
+    node.sdo[0x6087].phys = 100
     d.setTargetTorque(0)
     d.startOperation()
 
@@ -68,19 +75,26 @@ def main(screen):
     screen.addstr(3, 0, f"Additional Position: ")
     screen.addstr(4, 0, f"===")
     i = 0
+    start_time = 0
     try:
         while True:
+            last_time = start_time
+            start_time = time.time()
+            node.tpdo[1].wait_for_reception(1)
             if i == 5000:
-                node.rpdo[1][0x6071].raw = 100
+                node.rpdo[1][0x6071].raw = 80
             values = getValue()
             screen.addstr(1, 21, f"{values[0]:10}")
             screen.addstr(2, 21, f"{values[1]:10}")
             screen.addstr(3, 21, f"{values[2]:10}")
             screen.refresh()
             i += 1
-            time.sleep(0.001)
     except KeyboardInterrupt:
         d.shutdown()
+        screen.clear()
+        screen.refresh()
+        print(f"interval entre 2 exécution {start_time - last_time}")
+        time.sleep(4)
 
 
 curses.wrapper(main)
