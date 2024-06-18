@@ -1,0 +1,6 @@
+[submodule "canopen-stack"]
+	path = canopen-stack
+	url = https://github.com/heig-vd-iai/canopen-stack.git
+[submodule "canopen_stack"]
+	path = canopen_stack
+	url = https://github.com/heig-vd-iai/canopen-stack.git
