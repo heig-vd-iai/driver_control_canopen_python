@@ -8,7 +8,7 @@ Add
 dtparam=spi=on
 dtoverlay=mcp2515-can0,oscillator=12000000,interrupt=25,spimaxfrequency=2000000
 ```
-to `/boot/config.txt`
+to `/boot/firmware/config.txt`
 
 > [!NOTE]
 > oscillator is the frequency of the crystal connected to the MCP2515. The default value is 12MHz. If you are using a other frequency, you must change this value.
