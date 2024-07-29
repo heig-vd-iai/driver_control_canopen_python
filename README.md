@@ -34,6 +34,10 @@ sudo ifconfig can0 txqueuelen 65536
 
 
 # Driver Library
+## Install requirement
+```bash
+pip install -r requirements.txt
+```
 The driver.py library allows interfacing with the driver of the ServoPress2 board.
 
 ## Connection
